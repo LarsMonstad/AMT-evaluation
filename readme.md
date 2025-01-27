@@ -25,6 +25,9 @@ This repository contains evaluation tools and MIDI files for measuring F1 scores
 3. Select "Restart and run all"
 4. Follow the cell-by-cell execution to view results
 
+
+![F1 scores](graph123.png)
+
 ## Contributing
 
 We welcome contributions to improve the evaluation framework. Please follow these steps:
