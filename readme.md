@@ -17,6 +17,7 @@ This repository contains evaluation tools and MIDI files for measuring F1 scores
 - Google account
 - Web browser
 - Internet connection
+- Human being
 
 ### Running the Evaluation
 
