@@ -282,6 +282,116 @@ def diagnose_stage(ref_path, est_path):
     }
 
 
+def per_note_diagnosis(ref_path, est_path):
+    """Per-note diagnostic comparing one (truth, estimate) pair.
+
+    Returns a DataFrame with one row per truth note plus one row per unmatched
+    est note (false positives). Columns:
+      truth_idx, est_idx, truth_onset, truth_offset, truth_pitch,
+      est_onset, est_offset, est_pitch,
+      onset_diff_ms, offset_diff_ms, pitch_diff_cents,
+      status: one of
+        matched_strict       — passes onset, pitch, AND strict offset (5%/25ms)
+        matched_std          — passes onset and pitch tolerances; offset may not
+        unmatched_pitch      — best candidate within onset tol but pitch > 50c
+        unmatched_offset     — like matched_std but failed strict offset
+        unmatched_pitch+onset — both onset and pitch out of tolerance
+        missed               — no est note within loose-onset (100ms) range
+        extra                — est note that didn't match any truth (false +ve)
+
+    Useful when the post-processor's author asks "show me the bad notes".
+    Sort by abs(pitch_diff_cents) desc to surface the worst pitch offenders;
+    sort by abs(offset_diff_ms) for offset offenders.
+    """
+    import numpy as np
+    import mir_eval, pretty_midi
+    import pandas as pd
+    ref_int, ref_pi, ref_pf = load_notes(ref_path)
+    est_int, est_pi, est_pf = load_notes(est_path)
+    ref_hz = np.array([pretty_midi.note_number_to_hz(p) for p in ref_pi])
+    est_hz = np.array([pretty_midi.note_number_to_hz(p) for p in est_pi])
+
+    M_std = dict(mir_eval.transcription.match_notes(
+        ref_int, ref_hz, est_int, est_hz,
+        onset_tolerance=0.05, pitch_tolerance=50.0,
+        offset_ratio=None, offset_min_tolerance=0.05))
+    M_strict = dict(mir_eval.transcription.match_notes(
+        ref_int, ref_hz, est_int, est_hz,
+        onset_tolerance=0.05, pitch_tolerance=50.0,
+        offset_ratio=0.05, offset_min_tolerance=0.025))
+    # Loose match: onset 100 ms, pitch 4 semitones — gets a candidate for almost every truth
+    M_loose = dict(mir_eval.transcription.match_notes(
+        ref_int, ref_hz, est_int, est_hz,
+        onset_tolerance=0.1, pitch_tolerance=400.0,
+        offset_ratio=None, offset_min_tolerance=0.1))
+
+    rows = []
+    matched_est = set()
+    for i in range(len(ref_int)):
+        if i in M_std:
+            j = M_std[i]
+            status = "matched_strict" if i in M_strict else (
+                "matched_std" if (i in M_std) else "matched_std")
+            # If matched in std but not strict, status is matched_std + offset miss
+            if i not in M_strict:
+                status = "unmatched_offset"
+            else:
+                status = "matched_strict"
+        elif i in M_loose:
+            j = M_loose[i]
+            onset_off = abs(est_int[j, 0] - ref_int[i, 0])
+            cents_off = abs(1200 * np.log2(est_hz[j] / ref_hz[i]))
+            reasons = []
+            if onset_off > 0.05:
+                reasons.append("onset")
+            if cents_off > 50:
+                reasons.append("pitch")
+            status = "unmatched_" + "+".join(reasons) if reasons else "unmatched_other"
+        else:
+            j = None
+            status = "missed"
+
+        if j is not None:
+            matched_est.add(j)
+            rows.append({
+                "truth_idx": i, "est_idx": j,
+                "truth_onset": float(ref_int[i, 0]),
+                "truth_offset": float(ref_int[i, 1]),
+                "truth_pitch": float(ref_pf[i]),
+                "est_onset": float(est_int[j, 0]),
+                "est_offset": float(est_int[j, 1]),
+                "est_pitch": float(est_pf[j]),
+                "onset_diff_ms": float((est_int[j, 0] - ref_int[i, 0]) * 1000),
+                "offset_diff_ms": float((est_int[j, 1] - ref_int[i, 1]) * 1000),
+                "pitch_diff_cents": float((est_pf[j] - ref_pf[i]) * 100.0),
+                "status": status,
+            })
+        else:
+            rows.append({
+                "truth_idx": i, "est_idx": None,
+                "truth_onset": float(ref_int[i, 0]),
+                "truth_offset": float(ref_int[i, 1]),
+                "truth_pitch": float(ref_pf[i]),
+                "est_onset": None, "est_offset": None, "est_pitch": None,
+                "onset_diff_ms": None, "offset_diff_ms": None, "pitch_diff_cents": None,
+                "status": "missed",
+            })
+
+    for j in range(len(est_int)):
+        if j not in matched_est:
+            rows.append({
+                "truth_idx": None, "est_idx": j,
+                "truth_onset": None, "truth_offset": None, "truth_pitch": None,
+                "est_onset": float(est_int[j, 0]),
+                "est_offset": float(est_int[j, 1]),
+                "est_pitch": float(est_pf[j]),
+                "onset_diff_ms": None, "offset_diff_ms": None, "pitch_diff_cents": None,
+                "status": "extra",
+            })
+
+    return pd.DataFrame(rows)
+
+
 def diagnose_identical(p1, p2, cols=("onset", "offset", "onpitch")):
     """Are two CSVs byte-identical on the supplied columns? Returns bool or None
     if either file isn't a CSV."""

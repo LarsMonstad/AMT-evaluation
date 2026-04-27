@@ -105,6 +105,51 @@ def diagnostics_for_dir(directory):
     return pd.DataFrame(rows)
 
 
+def per_note_dir(directory, stages, out_dir):
+    """Write per_note_<tune>_<stage>.csv for every (tune, stage) pair."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written = []
+    summary = []
+    for entry in ev.discover(directory):
+        for stage in stages:
+            est = entry["stages"].get(stage)
+            if est is None:
+                continue
+            df = ev.per_note_diagnosis(entry["truth"], est)
+            stage_safe = stage.replace("+", "plus").replace(" ", "_")
+            out = out_dir / f"per_note_{entry['tune']}_{stage_safe}.csv"
+            df.to_csv(out, index=False, float_format="%.4f")
+            written.append(out)
+            counts = df["status"].value_counts().to_dict()
+            summary.append({"tune": entry["tune"], "stage": stage, "n_truth": int((df["truth_idx"].notna()).sum()), **counts})
+    return written, pd.DataFrame(summary).fillna(0)
+
+
+def print_top_offenders(per_note_dir_path, top_n=10):
+    """For each per_note CSV, print the worst pitch and offset errors."""
+    per_note_dir_path = Path(per_note_dir_path)
+    for csv in sorted(per_note_dir_path.glob("per_note_*.csv")):
+        df = pd.read_csv(csv)
+        # Worst pitch (only matched-or-close rows have pitch_diff_cents)
+        pitched = df[df["pitch_diff_cents"].notna()].copy()
+        if pitched.empty:
+            continue
+        pitched["abs_cents"] = pitched["pitch_diff_cents"].abs()
+        worst_pitch = pitched.sort_values("abs_cents", ascending=False).head(top_n)
+        worst_offset = pitched.copy()
+        worst_offset["abs_offset"] = worst_offset["offset_diff_ms"].abs()
+        worst_offset = worst_offset.sort_values("abs_offset", ascending=False).head(top_n)
+        print()
+        print(f"== {csv.name} ==")
+        print(f"  Top {top_n} pitch offenders (sort: |pitch_diff_cents|):")
+        print(worst_pitch[["truth_onset", "truth_pitch", "est_pitch", "pitch_diff_cents", "status"]]
+              .round(3).to_string(index=False))
+        print(f"  Top {top_n} offset offenders (sort: |offset_diff_ms|):")
+        print(worst_offset[["truth_onset", "truth_offset", "est_offset", "offset_diff_ms", "status"]]
+              .round(3).to_string(index=False))
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("directory", nargs="?", default="postpros",
@@ -113,6 +158,10 @@ def main(argv=None):
                     help="Output prefix (writes PREFIX.csv, PREFIX.tex, PREFIX_diagnostics.csv)")
     ap.add_argument("--stages", nargs="+", default=["raw", "+pitch", "+offset"],
                     help="Stages to evaluate (in order)")
+    ap.add_argument("--per-note-dir", default="per_note",
+                    help="Subdir for per-note CSVs (default: ./per_note)")
+    ap.add_argument("--top-offenders", type=int, default=10,
+                    help="Print this many worst-pitch / worst-offset notes per (tune, stage) (default: 10)")
     args = ap.parse_args(argv)
 
     directory = Path(args.directory)
@@ -142,6 +191,12 @@ def main(argv=None):
     diag.to_csv(out_diag, index=False, float_format="%.4f")
     print(f"wrote {out_diag}")
 
+    written, status_counts = per_note_dir(directory, args.stages, args.per_note_dir)
+    print(f"wrote {len(written)} per-note CSVs to {args.per_note_dir}/")
+    print()
+    print("Status counts per (tune, stage):")
+    print(status_counts.to_string(index=False))
+
     # Summary to stdout
     print()
     print("Per-tune results:")
@@ -157,6 +212,11 @@ def main(argv=None):
     print("Stage diagnostics:")
     print(diag[["tune", "stage", "n_est", "pitch_bias_cents", "pitch_p95_cents",
                 "duration_floor_ms", "duration_floor_count"]].round(2).to_string(index=False))
+
+    if args.top_offenders > 0:
+        print()
+        print(f"Top offenders per (tune, stage), useful for spectrogram inspection:")
+        print_top_offenders(args.per_note_dir, top_n=args.top_offenders)
     return 0
 
 
