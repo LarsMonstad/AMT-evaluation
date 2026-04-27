@@ -1,0 +1,7 @@
+tune,stage,pitch_bias_cents,pitch_p95_cents,duration_floor_ms,duration_floor_count,n_est
+Godvaersdagen,raw,10.0149,35.5000,1.0417,1,1165
+Godvaersdagen,+pitch,-10.1029,42.0000,99.9900,245,1157
+Godvaersdagen,+offset,-10.1029,42.0000,99.9900,245,1157
+Spretten,raw,-1.5447,25.9970,3.6458,2,692
+Spretten,+pitch,-11.2380,56.4500,100.0000,153,678
+Spretten,+offset,-11.2380,56.4500,100.0000,153,678
