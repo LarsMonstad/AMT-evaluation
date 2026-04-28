@@ -183,51 +183,94 @@ def evaluate_pair(ref_path, est_path, verbose=False):
 # Auto-discovery: pair every *_truther*.csv with its raw .mid + stage CSVs
 # ----------------------------------------------------------------------
 
-def discover(directory):
+TRUTH_TOKENS = ("truther", "truer", "truth")
+PITCH_TOKENS = ("pitch", "newestpitch")
+OFFSET_TOKENS = ("offset", "newestoffset")
+
+
+def _pick_latest(paths):
+    """Pick the most recently exported file from a sorted list. Filenames in this
+    repo carry timestamps like '28-Apr-2026 06-30-32', so the lexicographically
+    last entry is the most recent — but only after grouping by token, not across.
+    Simpler approach: pick the one with the greatest mtime."""
+    if not paths:
+        return None
+    return str(max(paths, key=lambda p: p.stat().st_mtime))
+
+
+def discover(directory, raw_fallback_dir=None):
     """Walk a directory, return a list of {tune, truth, stages: {raw, +pitch, +offset}} dicts.
 
-    File naming conventions:
-      <tune>_truther *.csv                       -> truth annotation
-      <tune>_<base>.mid                          -> raw model output
-      <tune>_<base>_pitch *.csv                  -> after pitch refinement
-      <tune>_<base>_offset *.csv                 -> after pitch + offset refinement
+    Naming conventions supported (any of these tokens is recognised):
+      truth:  <tune>_truther*.csv  | <tune>_truer*.csv  | <tune>_truth*.csv
+      raw:    <tune>_*.mid         (optional; if absent, raw stage is skipped)
+      pitch:  <tune>_*_pitch*.csv  | <tune>_*_newestpitch*.csv
+      offset: <tune>_*_offset*.csv | <tune>_*_newestoffset*.csv
 
-    Tune name is whatever precedes "_truther" in the truth filename. The raw .mid
-    is matched by the closest non-empty <base> token; pitch/offset CSVs are matched
-    against that base. Stages with no file resolve to None and are skipped during
-    evaluation.
+    Tune name is whatever precedes the truth-token suffix in the truth filename.
+    Multiple stage CSVs for the same tune resolve to the most recently modified
+    file. Stages with no file resolve to None and are skipped during evaluation.
+
+    If `raw_fallback_dir` is provided, missing raw .mid files are also looked up
+    there. Useful when a refined-stage export omits the unchanged raw output.
     """
     from pathlib import Path
-    import re
     directory = Path(directory)
+    fallback = Path(raw_fallback_dir) if raw_fallback_dir else None
     tunes = []
-    for truth in sorted(directory.glob("*_truther*.csv")):
-        tune = truth.name.split("_truther")[0]
-        # Find any sibling .mid whose name starts with "<tune>_" — pick the shortest,
-        # because longer ones are likely stage-suffixed.
-        candidates = sorted(directory.glob(f"{tune}_*.mid"),
-                            key=lambda p: len(p.name))
-        raw = str(candidates[0]) if candidates else None
-        # Base = raw stem (e.g. "Spretten_original_transkun239")
-        base = Path(raw).stem if raw else f"{tune}_*"
-        pitch_csvs = sorted(directory.glob(f"{base}_pitch*.csv"))
-        offset_csvs = sorted(directory.glob(f"{base}_offset*.csv"))
+
+    # Find truth files using any of the truth tokens
+    truth_files = []
+    seen = set()
+    for tok in TRUTH_TOKENS:
+        for p in directory.glob(f"*_{tok}*.csv"):
+            if p not in seen:
+                truth_files.append(p)
+                seen.add(p)
+    truth_files.sort()
+
+    for truth in truth_files:
+        # Tune name is the part before the first matching truth token
+        tune = truth.name
+        for tok in TRUTH_TOKENS:
+            marker = f"_{tok}"
+            if marker in tune:
+                tune = tune.split(marker)[0]
+                break
+
+        # Raw .mid — try directory first, then fallback. Pick shortest name (no stage suffix).
+        raw_candidates = sorted(directory.glob(f"{tune}_*.mid"), key=lambda p: len(p.name))
+        if not raw_candidates and fallback:
+            raw_candidates = sorted(fallback.glob(f"{tune}_*.mid"), key=lambda p: len(p.name))
+        raw = str(raw_candidates[0]) if raw_candidates else None
+
+        # Stage CSVs: union over all stage tokens, scoped to this tune
+        pitch_csvs = []
+        offset_csvs = []
+        for tok in PITCH_TOKENS:
+            pitch_csvs.extend(directory.glob(f"{tune}_*_{tok}*.csv"))
+        for tok in OFFSET_TOKENS:
+            offset_csvs.extend(directory.glob(f"{tune}_*_{tok}*.csv"))
+        # Filter out truth files that may have been picked up by overlapping patterns
+        pitch_csvs = [p for p in pitch_csvs if not any(t in p.name for t in (f"_{x}" for x in TRUTH_TOKENS))]
+        offset_csvs = [p for p in offset_csvs if not any(t in p.name for t in (f"_{x}" for x in TRUTH_TOKENS))]
+
         tunes.append({
             "tune": tune,
             "truth": str(truth),
             "stages": {
                 "raw": raw,
-                "+pitch": str(pitch_csvs[0]) if pitch_csvs else None,
-                "+offset": str(offset_csvs[0]) if offset_csvs else None,
+                "+pitch": _pick_latest(pitch_csvs),
+                "+offset": _pick_latest(offset_csvs),
             },
         })
     return tunes
 
 
-def evaluate_directory(directory, stages=("raw", "+pitch", "+offset")):
+def evaluate_directory(directory, stages=("raw", "+pitch", "+offset"), raw_fallback_dir=None):
     """Run evaluate_pair on every (tune, stage) found by discover()."""
     rows = []
-    for entry in discover(directory):
+    for entry in discover(directory, raw_fallback_dir=raw_fallback_dir):
         for stage in stages:
             est = entry["stages"].get(stage)
             if est is None:

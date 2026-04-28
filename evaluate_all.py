@@ -82,9 +82,9 @@ def build_latex(agg, stages):
     return "\n".join(lines) + "\n"
 
 
-def diagnostics_for_dir(directory):
+def diagnostics_for_dir(directory, raw_fallback=None):
     rows = []
-    for entry in ev.discover(directory):
+    for entry in ev.discover(directory, raw_fallback_dir=raw_fallback):
         truth = entry["truth"]
         stage_paths = entry["stages"]
         for stage, p in stage_paths.items():
@@ -105,13 +105,13 @@ def diagnostics_for_dir(directory):
     return pd.DataFrame(rows)
 
 
-def per_note_dir(directory, stages, out_dir):
+def per_note_dir(directory, stages, out_dir, raw_fallback=None):
     """Write per_note_<tune>_<stage>.csv for every (tune, stage) pair."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     summary = []
-    for entry in ev.discover(directory):
+    for entry in ev.discover(directory, raw_fallback_dir=raw_fallback):
         for stage in stages:
             est = entry["stages"].get(stage)
             if est is None:
@@ -162,6 +162,8 @@ def main(argv=None):
                     help="Subdir for per-note CSVs (default: ./per_note)")
     ap.add_argument("--top-offenders", type=int, default=10,
                     help="Print this many worst-pitch / worst-offset notes per (tune, stage) (default: 10)")
+    ap.add_argument("--raw-fallback", default=None,
+                    help="Look here for raw .mid files when DIRECTORY only has refined CSVs (e.g. postpros/)")
     args = ap.parse_args(argv)
 
     directory = Path(args.directory)
@@ -169,7 +171,8 @@ def main(argv=None):
         print(f"error: directory not found: {directory}", file=sys.stderr)
         return 2
 
-    rows = ev.evaluate_directory(directory, stages=tuple(args.stages))
+    rows = ev.evaluate_directory(directory, stages=tuple(args.stages),
+                                  raw_fallback_dir=args.raw_fallback)
     if not rows:
         print("error: no tunes discovered (need *_truther*.csv files)", file=sys.stderr)
         return 1
@@ -186,12 +189,13 @@ def main(argv=None):
     out_tex.write_text(build_latex(agg, args.stages))
     print(f"wrote {out_tex}")
 
-    diag = diagnostics_for_dir(directory)
+    diag = diagnostics_for_dir(directory, raw_fallback=args.raw_fallback)
     out_diag = Path(f"{args.out}_diagnostics.csv")
     diag.to_csv(out_diag, index=False, float_format="%.4f")
     print(f"wrote {out_diag}")
 
-    written, status_counts = per_note_dir(directory, args.stages, args.per_note_dir)
+    written, status_counts = per_note_dir(directory, args.stages, args.per_note_dir,
+                                           raw_fallback=args.raw_fallback)
     print(f"wrote {len(written)} per-note CSVs to {args.per_note_dir}/")
     print()
     print("Status counts per (tune, stage):")
