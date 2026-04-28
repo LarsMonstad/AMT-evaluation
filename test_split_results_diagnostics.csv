@@ -1,10 +1,16 @@
 tune,stage,pitch_bias_cents,pitch_p95_cents,duration_floor_ms,duration_floor_count,n_est
-00106-Furholt Otto-Fiskaren,raw,-0.0993,100.0000,40.6250,2,1109
-Godvaersdagen_original1,raw,-1.1765,100.0000,42.1875,1,985
-Godvaersdagen_original1,+pitch,-13.1027,53.5000,3.1200,2,1160
-Godvaersdagen_original1,+offset,-13.1027,53.5000,3.1200,2,1160
-IvarJorde_original1,raw,0.4082,0.0000,48.9583,1,261
-Peisestugu_original_torr_filtered_06-Jan-2025_13-43-39.mid_cleaned,raw,-0.1816,0.0000,40.6250,1,1703
-Spretten_original,raw,-0.7407,100.0000,15.1042,1,556
-Spretten_original,+pitch,-2.5182,68.0500,15.1100,1,679
-Spretten_original,+offset,-2.1548,68.1000,1.0500,1,677
+00106-Furholt Otto-Fiskaren,raw,-5.7380,66.2500,40.6250,2,1109
+00106-Furholt Otto-Fiskaren,+pitch,0.5050,10.0000,40.6200,2,1076
+00106-Furholt Otto-Fiskaren,+offset,0.5050,10.0000,0.5200,3,1076
+Godvaersdagen_original1,raw,18.0714,131.4000,42.1875,1,985
+Godvaersdagen_original1,+pitch,3.8345,124.0500,42.1900,1,982
+Godvaersdagen_original1,+offset,3.8345,124.0500,1.0500,1,982
+IvarJorde_original1,raw,-11.5617,34.3000,48.9583,1,261
+IvarJorde_original1,+pitch,0.9660,9.6000,48.9600,1,261
+IvarJorde_original1,+offset,0.9660,9.6000,30.2100,1,261
+Peisestugu_original_torr_filtered_06-Jan-2025_13-43-39.mid_cleaned,raw,10.0350,102.0000,40.6250,1,1703
+Peisestugu_original_torr_filtered_06-Jan-2025_13-43-39.mid_cleaned,+pitch,2.0412,96.8500,40.6300,1,1698
+Peisestugu_original_torr_filtered_06-Jan-2025_13-43-39.mid_cleaned,+offset,2.0412,96.8500,2.0800,1,1699
+Spretten_original,raw,3.2021,83.7500,15.1042,1,556
+Spretten_original,+pitch,0.8542,74.6500,15.1100,1,553
+Spretten_original,+offset,0.8542,74.6500,1.0400,1,553

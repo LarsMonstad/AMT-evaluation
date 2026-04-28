@@ -199,7 +199,7 @@ def evaluate_pair(ref_path, est_path, verbose=False):
 # Auto-discovery: pair every *_truther*.csv with its raw .mid + stage CSVs
 # ----------------------------------------------------------------------
 
-TRUTH_TOKENS = ("truther", "truer", "truth")
+TRUTH_TOKENS = ("groundtruther", "truther", "truer", "truth")
 PITCH_TOKENS = ("pitch", "newestpitch")
 OFFSET_TOKENS = ("offset", "newestoffset")
 
@@ -321,6 +321,17 @@ def discover_split(test_dir, model_dir=None, refined_dir=None):
             cand = sorted(model_path.glob(f"{tune}.mid"))
         raw = str(cand[0]) if cand else None
 
+        # Truth: prefer a `<tune>_groundtruther/_truther/_truer*.csv` from the
+        # refined dir (richer fractional pitch annotation). Fall back to the
+        # GT/<tune>.mid otherwise.
+        truth = str(gt_path)
+        if refined is not None:
+            for tok in TRUTH_TOKENS:
+                cand_t = sorted(refined.glob(f"{tune}_{tok}*.csv"))
+                if cand_t:
+                    truth = str(_pick_latest(cand_t))
+                    break
+
         pitch = offset = None
         if refined is not None:
             pc = list(refined.glob(f"{tune}_*pitch*.csv"))
@@ -332,7 +343,7 @@ def discover_split(test_dir, model_dir=None, refined_dir=None):
 
         tunes.append({
             "tune": tune,
-            "truth": str(gt_path),
+            "truth": truth,
             "stages": {"raw": raw, "+pitch": pitch, "+offset": offset},
         })
     return tunes
