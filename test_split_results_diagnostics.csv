@@ -1,23 +1,10 @@
 tune,stage,pitch_bias_cents,pitch_p95_cents,duration_floor_ms,duration_floor_count,n_est
 00106-Furholt Otto-Fiskaren,raw,-0.0993,100.0000,40.6250,2,1109
-Godvaersdagen_angry,raw,-0.2278,100.0000,40.1042,1,946
-Godvaersdagen_happy,raw,1.2101,100.0000,16.6667,1,964
 Godvaersdagen_original1,raw,-1.1765,100.0000,42.1875,1,985
 Godvaersdagen_original1,+pitch,-13.1027,53.5000,3.1200,2,1160
 Godvaersdagen_original1,+offset,-13.1027,53.5000,3.1200,2,1160
-Godvaersdagen_sad,raw,0.2148,100.0000,44.7917,1,1004
-Godvaersdagen_tender,raw,-2.5219,100.0000,15.1042,1,981
-Haslebuskane_angry,raw,1.0127,100.0000,42.7083,1,410
-IvarJorde_angry,raw,2.3166,0.0000,51.5625,2,269
-IvarJorde_happy,raw,1.9763,0.0000,48.4375,1,266
 IvarJorde_original1,raw,0.4082,0.0000,48.9583,1,261
-IvarJorde_sad,raw,0.8368,0.0000,51.5625,1,257
-IvarJorde_tender,raw,-0.8299,0.0000,48.9583,1,261
 Peisestugu_original_torr_filtered_06-Jan-2025_13-43-39.mid_cleaned,raw,-0.1816,0.0000,40.6250,1,1703
-Spretten_angry,raw,1.1673,100.0000,48.4375,1,539
-Spretten_happy,raw,-0.5848,100.0000,15.1042,1,532
 Spretten_original,raw,-0.7407,100.0000,15.1042,1,556
 Spretten_original,+pitch,-2.5182,68.0500,15.1100,1,679
 Spretten_original,+offset,-2.1548,68.1000,1.0500,1,677
-Spretten_sad,raw,1.0060,100.0000,48.4375,2,602
-Spretten_tender,raw,-0.7619,100.0000,46.3542,1,589

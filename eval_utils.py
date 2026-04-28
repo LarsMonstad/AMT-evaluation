@@ -323,10 +323,17 @@ def discover_split(test_dir, model_dir=None, refined_dir=None):
 
 
 def evaluate_split(test_dir, model_dir=None, refined_dir=None,
-                    stages=("raw", "+pitch", "+offset")):
-    """evaluate_pair across every (tune, stage) found by discover_split()."""
+                    stages=("raw", "+pitch", "+offset"), exclude=()):
+    """evaluate_pair across every (tune, stage) found by discover_split().
+
+    `exclude` is an iterable of substrings; any tune whose name contains any of
+    them is skipped. Useful for stripping the emotional variants
+    (`exclude=('_angry', '_happy', '_sad', '_tender')`).
+    """
     rows = []
     for entry in discover_split(test_dir, model_dir=model_dir, refined_dir=refined_dir):
+        if any(s in entry["tune"] for s in exclude):
+            continue
         for stage in stages:
             est = entry["stages"].get(stage)
             if est is None:

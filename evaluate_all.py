@@ -83,9 +83,10 @@ def build_latex(agg, stages):
 
 
 def diagnostics_for_dir(directory, raw_fallback=None,
-                         test_split=None, model_dir=None, refined_dir=None):
+                         test_split=None, model_dir=None, refined_dir=None, exclude=()):
     rows = []
-    for entry in _entries_for(directory, raw_fallback, test_split, model_dir, refined_dir):
+    for entry in _entries_for(directory, raw_fallback, test_split, model_dir,
+                                refined_dir, exclude=exclude):
         truth = entry["truth"]
         stage_paths = entry["stages"]
         for stage, p in stage_paths.items():
@@ -106,20 +107,26 @@ def diagnostics_for_dir(directory, raw_fallback=None,
     return pd.DataFrame(rows)
 
 
-def _entries_for(directory, raw_fallback=None, test_split=None, model_dir=None, refined_dir=None):
+def _entries_for(directory, raw_fallback=None, test_split=None, model_dir=None,
+                  refined_dir=None, exclude=()):
     if test_split:
-        return ev.discover_split(test_split, model_dir=model_dir, refined_dir=refined_dir)
-    return ev.discover(directory, raw_fallback_dir=raw_fallback)
+        entries = ev.discover_split(test_split, model_dir=model_dir, refined_dir=refined_dir)
+    else:
+        entries = ev.discover(directory, raw_fallback_dir=raw_fallback)
+    if exclude:
+        entries = [e for e in entries if not any(s in e["tune"] for s in exclude)]
+    return entries
 
 
 def per_note_dir(directory, stages, out_dir, raw_fallback=None,
-                  test_split=None, model_dir=None, refined_dir=None):
+                  test_split=None, model_dir=None, refined_dir=None, exclude=()):
     """Write per_note_<tune>_<stage>.csv for every (tune, stage) pair."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     summary = []
-    for entry in _entries_for(directory, raw_fallback, test_split, model_dir, refined_dir):
+    for entry in _entries_for(directory, raw_fallback, test_split, model_dir,
+                                refined_dir, exclude=exclude):
         for stage in stages:
             est = entry["stages"].get(stage)
             if est is None:
@@ -179,7 +186,14 @@ def main(argv=None):
                     help="With --test-split: name of the model subdir (auto-detected if omitted)")
     ap.add_argument("--refined-dir", default=None,
                     help="With --test-split: optional dir to find +pitch/+offset CSVs per tune")
+    ap.add_argument("--exclude", nargs="*", default=[],
+                    help="Skip any tune whose name contains one of these substrings "
+                         "(e.g. --exclude _angry _happy _sad _tender to drop emotional variants)")
+    ap.add_argument("--no-variants", action="store_true",
+                    help="Shortcut for --exclude _angry _happy _sad _tender")
     args = ap.parse_args(argv)
+    if args.no_variants:
+        args.exclude = list(set(args.exclude) | {"_angry", "_happy", "_sad", "_tender"})
 
     if args.test_split:
         test_dir = Path(args.test_split)
@@ -188,7 +202,8 @@ def main(argv=None):
             return 2
         rows = ev.evaluate_split(test_dir, model_dir=args.model_dir,
                                   refined_dir=args.refined_dir,
-                                  stages=tuple(args.stages))
+                                  stages=tuple(args.stages),
+                                  exclude=tuple(args.exclude))
         # Used by per-note + diagnostics below — point them at the split as well
         directory = test_dir
     else:
@@ -216,7 +231,8 @@ def main(argv=None):
 
     diag = diagnostics_for_dir(
         directory, raw_fallback=args.raw_fallback,
-        test_split=args.test_split, model_dir=args.model_dir, refined_dir=args.refined_dir)
+        test_split=args.test_split, model_dir=args.model_dir, refined_dir=args.refined_dir,
+        exclude=tuple(args.exclude))
     out_diag = Path(f"{args.out}_diagnostics.csv")
     diag.to_csv(out_diag, index=False, float_format="%.4f")
     print(f"wrote {out_diag}")
@@ -224,7 +240,8 @@ def main(argv=None):
     written, status_counts = per_note_dir(
         directory, args.stages, args.per_note_dir,
         raw_fallback=args.raw_fallback,
-        test_split=args.test_split, model_dir=args.model_dir, refined_dir=args.refined_dir)
+        test_split=args.test_split, model_dir=args.model_dir, refined_dir=args.refined_dir,
+        exclude=tuple(args.exclude))
     print(f"wrote {len(written)} per-note CSVs to {args.per_note_dir}/")
     print()
     print("Status counts per (tune, stage):")
