@@ -28,6 +28,16 @@ STRICT_PARAMS = dict(
     offset_min_tolerance=0.025,
 )
 
+# Onset+pitch only (no offset constraint). Equivalent to MIREX "Note (no offset)" /
+# "Onset+Pitch" track. Provided so the paper can report the looser-config baseline
+# alongside the offset-constrained F1 used for the main results.
+ONSET_ONLY_PARAMS = dict(
+    onset_tolerance=0.05,
+    pitch_tolerance=50.0,
+    offset_ratio=None,
+    offset_min_tolerance=0.05,
+)
+
 
 def _load_midi(path):
     midi = pretty_midi.PrettyMIDI(str(path))
@@ -100,6 +110,10 @@ def f1_strict(ref_intervals, ref_pitches, est_intervals, est_pitches):
     return f1_overlap(ref_intervals, ref_pitches, est_intervals, est_pitches, STRICT_PARAMS)
 
 
+def f1_onset_only(ref_intervals, ref_pitches, est_intervals, est_pitches):
+    return f1_overlap(ref_intervals, ref_pitches, est_intervals, est_pitches, ONSET_ONLY_PARAMS)
+
+
 def _match(ref_intervals, ref_pitches, est_intervals, est_pitches, offset_ratio, offset_min_tolerance):
     if len(ref_intervals) == 0 or len(est_intervals) == 0:
         return []
@@ -168,11 +182,13 @@ def evaluate_pair(ref_path, est_path, verbose=False):
 
     p_std, r_std, f_std = f1_standard(ref_int, ref_pi, est_int, est_pi)
     p_str, r_str, f_str = f1_strict(ref_int, ref_pi, est_int, est_pi)
+    p_on,  r_on,  f_on  = f1_onset_only(ref_int, ref_pi, est_int, est_pi)
     mae = deviation_mae(ref_int, ref_pi, ref_pf, est_int, est_pi, est_pf)
 
     return {
         "n_ref": len(ref_int),
         "n_est": len(est_int),
+        "P_onset": p_on, "R_onset": r_on, "F_onset": f_on,
         "P_std": p_std, "R_std": r_std, "F_std": f_std,
         "P_strict": p_str, "R_strict": r_str, "F_strict": f_str,
         **mae,

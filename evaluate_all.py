@@ -46,6 +46,7 @@ def aggregate(per_pair, stages):
             "stage": stage,
             "n_ref": int(sub["n_ref"].sum()),
             "n_est": int(sub["n_est"].sum()),
+            "F_onset": weighted_mean(sub, "F_onset"),
             "F_std": weighted_mean(sub, "F_std"),
             "F_strict": weighted_mean(sub, "F_strict"),
             "onset_mae_ms": weighted_mean(sub, "onset_mae_ms"),
@@ -60,10 +61,10 @@ def aggregate(per_pair, stages):
 def build_latex(agg, stages):
     EOL = "\\\\"
     lines = [
-        r"\begin{tabular}{lccccc}",
+        r"\begin{tabular}{lcccccc}",
         r"\hline",
-        f"Stage & F1 & F1 & Onset & Offset & Pitch {EOL}",
-        f"      & (std) & (strict) & MAE [ms] & MAE [ms] & MAE [ct] {EOL}",
+        f"Stage & F1 & F1 & F1 & Onset & Offset & Pitch {EOL}",
+        f"      & (onset) & (std) & (strict) & MAE [ms] & MAE [ms] & MAE [ct] {EOL}",
         r"\hline",
     ]
     for stage in stages:
@@ -73,7 +74,7 @@ def build_latex(agg, stages):
         r = rows.iloc[0]
         label = STAGE_LABELS.get(stage, stage)
         lines.append(
-            f"{label} & {r['F_std']*100:.2f} & {r['F_strict']*100:.2f} & "
+            f"{label} & {r['F_onset']*100:.2f} & {r['F_std']*100:.2f} & {r['F_strict']*100:.2f} & "
             f"{r['onset_mae_ms']:.1f} & {r['offset_mae_ms']:.1f} & "
             f"{r['pitch_mae_cents']:.1f} {EOL}"
         )
@@ -250,13 +251,13 @@ def main(argv=None):
     # Summary to stdout
     print()
     print("Per-tune results:")
-    cols = ["tune", "stage", "n_ref", "F_std", "F_strict",
+    cols = ["tune", "stage", "n_ref", "F_onset", "F_std", "F_strict",
             "onset_mae_ms", "offset_mae_ms", "pitch_mae_cents",
             "n_match_std", "n_match_offset"]
     print(per_pair[cols].round(3).to_string(index=False))
     print()
     print("Aggregate (note-weighted across tunes):")
-    print(agg[["stage", "n_ref", "F_std", "F_strict",
+    print(agg[["stage", "n_ref", "F_onset", "F_std", "F_strict",
                "onset_mae_ms", "offset_mae_ms", "pitch_mae_cents"]].round(3).to_string(index=False))
     print()
     print("Stage diagnostics:")
