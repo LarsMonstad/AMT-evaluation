@@ -267,6 +267,75 @@ def discover(directory, raw_fallback_dir=None):
     return tunes
 
 
+def discover_split(test_dir, model_dir=None, refined_dir=None):
+    """Discover tunes from a `<test>/GT/<tune>.mid` + `<test>/<model>/<tune>_transcribed_*.mid` layout.
+
+    Used for evaluating a held-out test split where every tune has a MIDI ground
+    truth (no fractional pitch) and a model-emitted MIDI prediction.
+
+    test_dir/
+      GT/<tune>.mid                                   -> truth
+      <model>/<tune>_transcribed_*.mid                -> raw stage
+      <model>/<tune>.mid                              -> raw stage (alt naming)
+
+    refined_dir (optional): pull `<tune>*_pitch*.csv` and `<tune>*_offset*.csv`
+    as +pitch / +offset stages. Tunes without refined files just get None for
+    those stages and are skipped during evaluation.
+    """
+    from pathlib import Path
+    test_dir = Path(test_dir)
+    gt_dir = test_dir / "GT"
+    if not gt_dir.exists():
+        raise FileNotFoundError(f"No GT/ subdir in {test_dir}")
+    if model_dir is None:
+        candidates = [p for p in test_dir.iterdir() if p.is_dir() and p.name != "GT"]
+        if not candidates:
+            raise FileNotFoundError(f"No model subdir in {test_dir}")
+        model_path = candidates[0]
+    else:
+        model_path = (test_dir / model_dir) if not Path(model_dir).is_absolute() else Path(model_dir)
+
+    refined = Path(refined_dir) if refined_dir else None
+    tunes = []
+    for gt_path in sorted(gt_dir.glob("*.mid")):
+        tune = gt_path.stem
+        # Raw: prefer "<tune>_transcribed*.mid", fall back to "<tune>.mid"
+        cand = sorted(model_path.glob(f"{tune}_transcribed*.mid"))
+        if not cand:
+            cand = sorted(model_path.glob(f"{tune}.mid"))
+        raw = str(cand[0]) if cand else None
+
+        pitch = offset = None
+        if refined is not None:
+            pc = list(refined.glob(f"{tune}_*pitch*.csv"))
+            oc = list(refined.glob(f"{tune}_*offset*.csv"))
+            pc = [p for p in pc if not any(f"_{t}" in p.name for t in TRUTH_TOKENS)]
+            oc = [p for p in oc if not any(f"_{t}" in p.name for t in TRUTH_TOKENS)]
+            pitch = _pick_latest(pc)
+            offset = _pick_latest(oc)
+
+        tunes.append({
+            "tune": tune,
+            "truth": str(gt_path),
+            "stages": {"raw": raw, "+pitch": pitch, "+offset": offset},
+        })
+    return tunes
+
+
+def evaluate_split(test_dir, model_dir=None, refined_dir=None,
+                    stages=("raw", "+pitch", "+offset")):
+    """evaluate_pair across every (tune, stage) found by discover_split()."""
+    rows = []
+    for entry in discover_split(test_dir, model_dir=model_dir, refined_dir=refined_dir):
+        for stage in stages:
+            est = entry["stages"].get(stage)
+            if est is None:
+                continue
+            r = evaluate_pair(entry["truth"], est)
+            rows.append({"tune": entry["tune"], "stage": stage, **r})
+    return rows
+
+
 def evaluate_directory(directory, stages=("raw", "+pitch", "+offset"), raw_fallback_dir=None):
     """Run evaluate_pair on every (tune, stage) found by discover()."""
     rows = []

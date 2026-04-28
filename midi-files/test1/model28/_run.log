@@ -1,0 +1,110 @@
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/Users/lrs1/Documents/mirage/projects/Musscribe/venv/lib/python3.10/site-packages/torch/utils/checkpoint.py:232: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  check_backward_validity(args)
+Found 18 audio file(s) in test1audio
+[1/18] Transcribing 00106-Furholt Otto-Fiskaren.wav...
+  -> 00106-Furholt Otto-Fiskaren_transcribed_20260428.mid
+[2/18] Transcribing Godvaersdagen_angry.wav...
+  -> Godvaersdagen_angry_transcribed_20260428.mid
+[3/18] Transcribing Godvaersdagen_happy.wav...
+  -> Godvaersdagen_happy_transcribed_20260428.mid
+[4/18] Transcribing Godvaersdagen_original1.wav...
+  -> Godvaersdagen_original1_transcribed_20260428.mid
+[5/18] Transcribing Godvaersdagen_sad.wav...
+  -> Godvaersdagen_sad_transcribed_20260428.mid
+[6/18] Transcribing Godvaersdagen_tender.wav...
+  -> Godvaersdagen_tender_transcribed_20260428.mid
+[7/18] Transcribing Haslebuskane_angry.wav...
+  -> Haslebuskane_angry_transcribed_20260428.mid
+[8/18] Transcribing IvarJorde_angry.wav...
+  -> IvarJorde_angry_transcribed_20260428.mid
+[9/18] Transcribing IvarJorde_happy.wav...
+  -> IvarJorde_happy_transcribed_20260428.mid
+[10/18] Transcribing IvarJorde_original1.wav...
+  -> IvarJorde_original1_transcribed_20260428.mid
+[11/18] Transcribing IvarJorde_sad.wav...
+  -> IvarJorde_sad_transcribed_20260428.mid
+[12/18] Transcribing IvarJorde_tender.wav...
+  -> IvarJorde_tender_transcribed_20260428.mid
+[13/18] Transcribing Peisestugu_original_torr_filtered_06-Jan-2025_13-43-39.mid_cleaned.wav...
+  -> Peisestugu_original_torr_filtered_06-Jan-2025_13-43-39.mid_cleaned_transcribed_20260428.mid
+[14/18] Transcribing Spretten_angry.wav...
+  -> Spretten_angry_transcribed_20260428.mid
+[15/18] Transcribing Spretten_happy.wav...
+  -> Spretten_happy_transcribed_20260428.mid
+[16/18] Transcribing Spretten_original.wav...
+  -> Spretten_original_transcribed_20260428.mid
+[17/18] Transcribing Spretten_sad.wav...
+  -> Spretten_sad_transcribed_20260428.mid
+[18/18] Transcribing Spretten_tender.wav...
+  -> Spretten_tender_transcribed_20260428.mid
+Done.

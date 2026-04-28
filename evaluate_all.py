@@ -82,9 +82,10 @@ def build_latex(agg, stages):
     return "\n".join(lines) + "\n"
 
 
-def diagnostics_for_dir(directory, raw_fallback=None):
+def diagnostics_for_dir(directory, raw_fallback=None,
+                         test_split=None, model_dir=None, refined_dir=None):
     rows = []
-    for entry in ev.discover(directory, raw_fallback_dir=raw_fallback):
+    for entry in _entries_for(directory, raw_fallback, test_split, model_dir, refined_dir):
         truth = entry["truth"]
         stage_paths = entry["stages"]
         for stage, p in stage_paths.items():
@@ -105,13 +106,20 @@ def diagnostics_for_dir(directory, raw_fallback=None):
     return pd.DataFrame(rows)
 
 
-def per_note_dir(directory, stages, out_dir, raw_fallback=None):
+def _entries_for(directory, raw_fallback=None, test_split=None, model_dir=None, refined_dir=None):
+    if test_split:
+        return ev.discover_split(test_split, model_dir=model_dir, refined_dir=refined_dir)
+    return ev.discover(directory, raw_fallback_dir=raw_fallback)
+
+
+def per_note_dir(directory, stages, out_dir, raw_fallback=None,
+                  test_split=None, model_dir=None, refined_dir=None):
     """Write per_note_<tune>_<stage>.csv for every (tune, stage) pair."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     summary = []
-    for entry in ev.discover(directory, raw_fallback_dir=raw_fallback):
+    for entry in _entries_for(directory, raw_fallback, test_split, model_dir, refined_dir):
         for stage in stages:
             est = entry["stages"].get(stage)
             if est is None:
@@ -153,7 +161,8 @@ def print_top_offenders(per_note_dir_path, top_n=10):
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("directory", nargs="?", default="postpros",
-                    help="Directory containing *_truther*.csv and stage files (default: postpros)")
+                    help="Directory containing *_truther*.csv and stage files (default: postpros). "
+                         "Ignored when --test-split is set.")
     ap.add_argument("--out", default="table_results",
                     help="Output prefix (writes PREFIX.csv, PREFIX.tex, PREFIX_diagnostics.csv)")
     ap.add_argument("--stages", nargs="+", default=["raw", "+pitch", "+offset"],
@@ -164,15 +173,31 @@ def main(argv=None):
                     help="Print this many worst-pitch / worst-offset notes per (tune, stage) (default: 10)")
     ap.add_argument("--raw-fallback", default=None,
                     help="Look here for raw .mid files when DIRECTORY only has refined CSVs (e.g. postpros/)")
+    ap.add_argument("--test-split", default=None,
+                    help="Use a test-split layout: <DIR>/GT/<tune>.mid + <DIR>/<model>/<tune>_transcribed_*.mid")
+    ap.add_argument("--model-dir", default=None,
+                    help="With --test-split: name of the model subdir (auto-detected if omitted)")
+    ap.add_argument("--refined-dir", default=None,
+                    help="With --test-split: optional dir to find +pitch/+offset CSVs per tune")
     args = ap.parse_args(argv)
 
-    directory = Path(args.directory)
-    if not directory.exists():
-        print(f"error: directory not found: {directory}", file=sys.stderr)
-        return 2
-
-    rows = ev.evaluate_directory(directory, stages=tuple(args.stages),
-                                  raw_fallback_dir=args.raw_fallback)
+    if args.test_split:
+        test_dir = Path(args.test_split)
+        if not test_dir.exists():
+            print(f"error: test-split dir not found: {test_dir}", file=sys.stderr)
+            return 2
+        rows = ev.evaluate_split(test_dir, model_dir=args.model_dir,
+                                  refined_dir=args.refined_dir,
+                                  stages=tuple(args.stages))
+        # Used by per-note + diagnostics below — point them at the split as well
+        directory = test_dir
+    else:
+        directory = Path(args.directory)
+        if not directory.exists():
+            print(f"error: directory not found: {directory}", file=sys.stderr)
+            return 2
+        rows = ev.evaluate_directory(directory, stages=tuple(args.stages),
+                                      raw_fallback_dir=args.raw_fallback)
     if not rows:
         print("error: no tunes discovered (need *_truther*.csv files)", file=sys.stderr)
         return 1
@@ -189,13 +214,17 @@ def main(argv=None):
     out_tex.write_text(build_latex(agg, args.stages))
     print(f"wrote {out_tex}")
 
-    diag = diagnostics_for_dir(directory, raw_fallback=args.raw_fallback)
+    diag = diagnostics_for_dir(
+        directory, raw_fallback=args.raw_fallback,
+        test_split=args.test_split, model_dir=args.model_dir, refined_dir=args.refined_dir)
     out_diag = Path(f"{args.out}_diagnostics.csv")
     diag.to_csv(out_diag, index=False, float_format="%.4f")
     print(f"wrote {out_diag}")
 
-    written, status_counts = per_note_dir(directory, args.stages, args.per_note_dir,
-                                           raw_fallback=args.raw_fallback)
+    written, status_counts = per_note_dir(
+        directory, args.stages, args.per_note_dir,
+        raw_fallback=args.raw_fallback,
+        test_split=args.test_split, model_dir=args.model_dir, refined_dir=args.refined_dir)
     print(f"wrote {len(written)} per-note CSVs to {args.per_note_dir}/")
     print()
     print("Status counts per (tune, stage):")
